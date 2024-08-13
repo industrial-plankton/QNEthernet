@@ -179,32 +179,37 @@ void enet_isr();
 // Reads a PHY register (using MDIO & MDC signals).
 uint16_t mdio_read(int regaddr)
 {
-  ENET_MMFR = ENET_MMFR_ST(1) | ENET_MMFR_OP(2) | ENET_MMFR_TA(2) |
-              ENET_MMFR_PA(0 /*phyaddr*/) | ENET_MMFR_RA(regaddr);
-  // int count=0;
-  while ((ENET_EIR & ENET_EIR_MII) == 0)
+  ENET_EIR = ENET_EIR_MII; // Clear status
+
+  ENET_MMFR = ENET_MMFR_ST(1) | ENET_MMFR_OP(2) | ENET_MMFR_PA(0 /*phyaddr*/) |
+              ENET_MMFR_RA(regaddr) | ENET_MMFR_TA(2);
+
+  u32_t time = micros();
+  while ((ENET_EIR & ENET_EIR_MII) == 0 && (micros() - time) < 500)
   {
-    // count++; // wait
   }
-  // print("mdio read waited ", count);
-  uint16_t data = ENET_MMFR;
-  ENET_EIR |= ENET_EIR_MII;
-  // printhex("mdio read:", data);
+  // printf("mdio read waited %d\r\n", count);
+  uint16_t data = ENET_MMFR_DATA(ENET_MMFR);
+  ENET_EIR = ENET_EIR_MII;
+  // printf("mdio read (%04xh): %04xh\r\n", regaddr, data);
   return data;
 }
 
 // Writes a PHY register (using MDIO & MDC signals).
 void mdio_write(int regaddr, uint16_t data)
 {
-  ENET_MMFR = ENET_MMFR_ST(1) | ENET_MMFR_OP(1) | ENET_MMFR_TA(2) |
-              ENET_MMFR_PA(0 /*phyaddr*/) | ENET_MMFR_RA(regaddr) |
+  ENET_EIR = ENET_EIR_MII; // Clear status
+
+  ENET_MMFR = ENET_MMFR_ST(1) | ENET_MMFR_OP(1) | ENET_MMFR_PA(0 /*phyaddr*/) |
+              ENET_MMFR_RA(regaddr) | ENET_MMFR_TA(2) |
               ENET_MMFR_DATA(data);
   // int count = 0;
-  while ((ENET_EIR & ENET_EIR_MII) == 0)
+  u32_t time = micros();
+  while ((ENET_EIR & ENET_EIR_MII) == 0 && (micros() - time) < 500)
   {
     // count++;  // wait
   }
-  ENET_EIR |= ENET_EIR_MII;
+  ENET_EIR = ENET_EIR_MII;
   // print("mdio write waited ", count);
   // printhex("mdio write :", data);
 }
