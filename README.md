@@ -1,3 +1,13 @@
+# This is a fork off working version 0.18.0
+
+Forked at this point for these reasons:
+
+- We need to maintain MIT licensing
+- Updating past 0.18.0 prevents our teensy from booting (red boot light flashes)
+- We encountered a bug getting stuck in the while loop in Mdio_Read()
+
+## Original Project README
+
 <a href="https://www.buymeacoffee.com/ssilverman" title="Donate to this project using Buy Me a Coffee"><img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-orange.svg?logo=buy-me-a-coffee&logoColor=FFDD00" alt="Buy Me a Coffee donate button"></a>
 
 # _QNEthernet_, an lwIP-Based Ethernet Library For Teensy 4.1
@@ -9,7 +19,7 @@ Teensy 4.1. While it is mostly the same, there are a few key differences that
 don't quite make it a drop-in replacement.
 
 The low-level code is based on code by Paul Stoffregen, here:\
-https://github.com/PaulStoffregen/teensy41_ethernet
+<https://github.com/PaulStoffregen/teensy41_ethernet>
 
 All the Teensy stuff is under the MIT license, so I'm making this library under
 the MIT license as well. Please see the _lwip-info/_ directory for the info
@@ -70,46 +80,48 @@ more information.**
 
 This library mostly follows the Arduino Ethernet API, with these differences
 and notes:
-* Include the `QNEthernet.h` header instead of `Ethernet.h`.
-* Ethernet `loop()` is called from `yield()`. The functions that wait for
+
+- Include the `QNEthernet.h` header instead of `Ethernet.h`.
+- Ethernet `loop()` is called from `yield()`. The functions that wait for
   timeouts rely on this. This also means that you must use `delay(ms)`,
   `yield()`, or `Ethernet.loop()` when waiting on conditions; waiting without
   calling these functions will cause the TCP/IP stack to never refresh. Note
   that many of the I/O functions call `loop()` so that there's less burden on
   the calling code.
-* The `Ethernet.begin(...)` functions don't block.
-* `EthernetServer::write(...)` functions always return the write size requested.
+- The `Ethernet.begin(...)` functions don't block.
+- `EthernetServer::write(...)` functions always return the write size requested.
   This is because different clients may behave differently.
-* The examples at
-  https://www.arduino.cc/reference/en/libraries/ethernet/server.accept/ and
-  https://www.arduino.cc/reference/en/libraries/ethernet/if-ethernetclient/
+- The examples at
+  <https://www.arduino.cc/reference/en/libraries/ethernet/server.accept/> and
+  <https://www.arduino.cc/reference/en/libraries/ethernet/if-ethernetclient/>
   directly contradict each other with regard to what `operator bool()` means in
   `EthernetClient`. The first example uses it as "already connected", while the
   second uses it as "available to connect". "Connected" is the chosen concept,
   but different from `connected()` in that it doesn't check for unread data.
-* All the Arduino-defined `Ethernet.begin(...)` functions that use the MAC
+- All the Arduino-defined `Ethernet.begin(...)` functions that use the MAC
   address are deprecated.
-* The following `Ethernet` functions are deprecated and do nothing or return
+- The following `Ethernet` functions are deprecated and do nothing or return
   some default value:
-  * `hardwareStatus()`: Returns `EthernetHardwareStatus::EthernetOtherHardware`
+  - `hardwareStatus()`: Returns `EthernetHardwareStatus::EthernetOtherHardware`
     because zero might be interpreted as "no hardware".
-  * `init(uint8_t sspin)`: Does nothing.
-  * `maintain()`: Returns zero.
-  * `setRetransmissionCount(uint8_t number)`: Does nothing.
-  * `setRetransmissionTimeout(uint16_t milliseconds)`: Does nothing.
-* The following `Ethernet` functions are deprecated but call
+  - `init(uint8_t sspin)`: Does nothing.
+  - `maintain()`: Returns zero.
+  - `setRetransmissionCount(uint8_t number)`: Does nothing.
+  - `setRetransmissionTimeout(uint16_t milliseconds)`: Does nothing.
+- The following `Ethernet` functions are deprecated but call
   something equivalent:
-  * `MACAddress(uint8_t mac[6])`
-  * `setDnsServerIP(const IPAddress &dnsServerIP)`
-* The following `EthernetUDP` functions do nothing:
-  * `flush()` because it is ill-defined.
-* The system starts with the Teensy's actual MAC address. If you want to use
+  - `MACAddress(uint8_t mac[6])`
+  - `setDnsServerIP(const IPAddress &dnsServerIP)`
+- The following `EthernetUDP` functions do nothing:
+  - `flush()` because it is ill-defined.
+- The system starts with the Teensy's actual MAC address. If you want to use
   that address with the deprecated API, you can collect it with
   `Ethernet.macAddress(mac)` and then pass it to one of the deprecated
   `begin(...)` functions.
-* All classes and objects are in the `qindesign::network` namespace. This means
+- All classes and objects are in the `qindesign::network` namespace. This means
   you'll need to fully qualify any types. To avoid this, you could utilize a
   `using` directive:
+
   ```c++
   using namespace qindesign::network;
 
@@ -119,8 +131,10 @@ and notes:
     Ethernet.begin();
   }
   ```
+
   However, this pollutes the current namespace. An alternative is to choose
   something shorter. For example:
+
   ```c++
   namespace qn = qindesign::network;
 
@@ -130,15 +144,17 @@ and notes:
     qn::Ethernet.begin();
   }
   ```
-* Files that configure lwIP for our system:
-  * *src/sys_arch.c*
-  * _src/lwipopts.h_ &larr; use this one for tuning (see _src/lwip/opt.h_ for
+
+- Files that configure lwIP for our system:
+  - _src/sys_arch.c_
+  - _src/lwipopts.h_ &larr; use this one for tuning (see _src/lwip/opt.h_ for
     more details)
-  * _src/arch/cc.h_
-* The main include file, `QNEthernet.h`, in addition to including the
+  - _src/arch/cc.h_
+
+- The main include file, `QNEthernet.h`, in addition to including the
   `Ethernet`, `EthernetFrame`, and `MDNS` instances, also includes the headers
   for `EthernetClient`, `EthernetServer`, and `EthernetUDP`.
-* Most of the `Ethernet` functions do nothing or return some form of
+- Most of the `Ethernet` functions do nothing or return some form of
   empty/nothing/false unless the system has been initialized.
 
 ## Additional functions and features not in the Arduino API
@@ -149,20 +165,21 @@ currently defined. (See:
 This section documents those functions.
 
 Features:
-* The `read(buf, len)` functions allow a NULL buffer so that the caller can skip
+
+- The `read(buf, len)` functions allow a NULL buffer so that the caller can skip
   data without having to read into a buffer.
 
 ### `Ethernet`
 
 The `Ethernet` object is the main Ethernet interface.
 
-* `begin()`: Initializes the library, uses the Teensy's internal MAC address,
+- `begin()`: Initializes the library, uses the Teensy's internal MAC address,
   and starts the DHCP client. This returns whether startup was successful.
-* `begin(ipaddr, netmask, gw)`: Initializes the library, uses the Teensy's
+- `begin(ipaddr, netmask, gw)`: Initializes the library, uses the Teensy's
   internal MAC address, and uses the given parameters for the network
   configuration. This returns whether startup was successful. The DNS server is
   not set.
-* `begin(ipaddr, netmask, gw, dns)`: Initializes the library, uses the Teensy's
+- `begin(ipaddr, netmask, gw, dns)`: Initializes the library, uses the Teensy's
   internal MAC address, and uses the given parameters for the network
   configuration. This returns whether startup was successful. The DNS server is
   only set if `dns` is `INADDR_NONE`.
@@ -172,98 +189,98 @@ The `Ethernet` object is the main Ethernet interface.
   ensure that the callback has all the information is to call
   `setDNSServerIP(ip)` before the three-parameter version.
 
-* `broadcastIP()`: Returns the broadcast IP address associated with the current
+- `broadcastIP()`: Returns the broadcast IP address associated with the current
   local IP and subnet mask.
-* `end()`: Shuts down the library, including the Ethernet clocks.
-* `hostname()`: Gets the DHCP client hostname. An empty string means that no
+- `end()`: Shuts down the library, including the Ethernet clocks.
+- `hostname()`: Gets the DHCP client hostname. An empty string means that no
   hostname is set. The default is "teensy-lwip".
-* `interfaceStatus()`: Returns the network interface status, `true` for UP and
+- `interfaceStatus()`: Returns the network interface status, `true` for UP and
   `false` for DOWN.
-* `isDHCPActive()`: Returns whether DHCP is active.
-* `linkState()`: Returns a `bool` indicating the link state.
-* `linkSpeed()`: Returns the link speed in Mbps.
-* `linkIsFullDuplex()`: Returns whether the link is full duplex (`true`) or half
+- `isDHCPActive()`: Returns whether DHCP is active.
+- `linkState()`: Returns a `bool` indicating the link state.
+- `linkSpeed()`: Returns the link speed in Mbps.
+- `linkIsFullDuplex()`: Returns whether the link is full duplex (`true`) or half
   duplex (`false`).
-* `joinGroup(ip)`: Joins a multicast group.
-* `leaveGroup(ip)`: Leaves a multicast group.
-* `macAddress(mac)`: Fills the 6-byte `mac` array with the current MAC address.
+- `joinGroup(ip)`: Joins a multicast group.
+- `leaveGroup(ip)`: Leaves a multicast group.
+- `macAddress(mac)`: Fills the 6-byte `mac` array with the current MAC address.
   Note that the equivalent Arduino function is `MACAddress(mac)`.
-* `setDNSServerIP(dnsServerIP)`: Sets the DNS server IP address. Note that the
+- `setDNSServerIP(dnsServerIP)`: Sets the DNS server IP address. Note that the
   equivalent Arduino function is `setDnsServerIP(dnsServerIP)`.
-* `setHostname(hostname)`: Sets the DHCP client hostname. The empty string will
+- `setHostname(hostname)`: Sets the DHCP client hostname. The empty string will
   set the hostname to nothing. To use something other than the default at system
   start, call this before calling `begin()`.
-* `setMACAddressAllowed(mac, flag)`: Allows or disallows Ethernet frames
+- `setMACAddressAllowed(mac, flag)`: Allows or disallows Ethernet frames
   addressed to the specified MAC address. This is useful when processing raw
   Ethernet frames.
-* `waitForLink(timeout)`: Waits for the specified timeout (milliseconds) for
+- `waitForLink(timeout)`: Waits for the specified timeout (milliseconds) for
   a link to be detected. This is useful when setting a static IP and making
   connections as a client. Returns whether a link was detected within the
   given timeout.
-* `waitForLocalIP(timeout)`: Waits for the specified timeout (milliseconds) for
+- `waitForLocalIP(timeout)`: Waits for the specified timeout (milliseconds) for
   the system to have a local IP address. This is useful when waiting for a
   DHCP-assigned address. Returns whether the system obtained an address within
   the given timeout. Note that this also works for a static-assigned address.
-* `operator bool()`: Tests if Ethernet is initialized.
-* Callback functions: Note that callbacks should be registered before any other
+- `operator bool()`: Tests if Ethernet is initialized.
+- Callback functions: Note that callbacks should be registered before any other
   Ethernet functions are called. This ensures that all events are captured. This
   includes `Ethernet.begin(...)`.
-  * `onLinkState(cb)`: The callback is called when the link changes state, for
+  - `onLinkState(cb)`: The callback is called when the link changes state, for
     example when the Ethernet cable is unplugged.
-  * `onAddressChanged(cb)`: The callback is called when any IP settings have
+  - `onAddressChanged(cb)`: The callback is called when any IP settings have
     changed. This might be called before the link or network interface is up if
     a static IP is set.
-  * `onInterfaceStatus(cb)`: The callback is called when the network interface
+  - `onInterfaceStatus(cb)`: The callback is called when the network interface
     status changes. It is called _after_ the interface is up but _before_ the
     interface goes down.
-* `static constexpr int maxMulticastGroups()`: Returns the maximum number of
+- `static constexpr int maxMulticastGroups()`: Returns the maximum number of
   multicast groups.
-* `static constexpr size_t mtu()`: Returns the MTU.
+- `static constexpr size_t mtu()`: Returns the MTU.
 
 ### `EthernetClient`
 
-* `abort()`: Aborts a connection without going through the TCP close process.
-* `close()`: Closes a connection, but without waiting. It's similar to `stop()`.
-* `closeOutput()`: Shuts down the transmit side of the socket. This is a
+- `abort()`: Aborts a connection without going through the TCP close process.
+- `close()`: Closes a connection, but without waiting. It's similar to `stop()`.
+- `closeOutput()`: Shuts down the transmit side of the socket. This is a
   half-close operation.
-* `connectionId()`: Returns an ID for the connection to which the client refers.
+- `connectionId()`: Returns an ID for the connection to which the client refers.
   It will return non-zero if connected and zero if not connected. Note that it's
   possible for new connections to reuse previously-used IDs.
-* `connectNoWait(ip, port)`: Similar to `connect(ip, port)`, but it doesn't
+- `connectNoWait(ip, port)`: Similar to `connect(ip, port)`, but it doesn't
   wait for a connection.
-* `connectNoWait(host, port)`: Similar to `connect(host, port)`, but it doesn't
+- `connectNoWait(host, port)`: Similar to `connect(host, port)`, but it doesn't
   wait for a connection. Note that the DNS lookup will still wait.
-* `writeFully(b)`: Writes a single byte.
-* `writeFully(s)`: Writes a string (`const char *`).
-* `writeFully(s, size)`: Writes characters (`const char *`).
-* `writeFully(buf, size)`: Writes a data buffer (`const uint8_t *`).
-* `static constexpr int maxSockets()`: Returns the maximum number of
+- `writeFully(b)`: Writes a single byte.
+- `writeFully(s)`: Writes a string (`const char *`).
+- `writeFully(s, size)`: Writes characters (`const char *`).
+- `writeFully(buf, size)`: Writes a data buffer (`const uint8_t *`).
+- `static constexpr int maxSockets()`: Returns the maximum number of
   TCP connections.
 
 #### TCP socket options
 
- * `setNoDelay(flag)`: Sets or clears the TCP_NODELAY flag in order to disable
+- `setNoDelay(flag)`: Sets or clears the TCP_NODELAY flag in order to disable
    or enable Nagle's algorithm, respectively. This must be changed for each
    new connection.
- * `isNoDelay()`: Returns whether the TCP_NODELAY flag is set for the current
+- `isNoDelay()`: Returns whether the TCP_NODELAY flag is set for the current
    connection. Returns false if not connected.
 
 ### `EthernetServer`
 
-* `begin(port)`: Starts the server on the given port, first disconnecting any
+- `begin(port)`: Starts the server on the given port, first disconnecting any
   existing server if it was listening on a different port. This returns whether
   the server was successfully started.
-* `beginWithReuse()`: Similar to `begin()`, but also sets the SO_REUSEADDR
+- `beginWithReuse()`: Similar to `begin()`, but also sets the SO_REUSEADDR
   socket option. This returns whether the server was successfully started.
-* `beginWithReuse(port)`: Similar to `begin(port)`, but also sets the
+- `beginWithReuse(port)`: Similar to `begin(port)`, but also sets the
   SO_REUSEADDR socket option. This returns whether the server was
   successfully started.
-* `end()`: Shuts down the server.
-* `port()`: Returns the server's port, a signed 32-bit value, where -1 means the
+- `end()`: Shuts down the server.
+- `port()`: Returns the server's port, a signed 32-bit value, where -1 means the
   port is not set and a non-negative value is a 16-bit quantity.
-* `static constexpr int maxListeners()`: Returns the maximum number of
+- `static constexpr int maxListeners()`: Returns the maximum number of
   TCP listeners.
-* `EthernetServer()`: Creates a placeholder server without a port. This form is
+- `EthernetServer()`: Creates a placeholder server without a port. This form is
   useful when you don't know the port in advance.
 
 All the `begin` functions call `end()` first only if the server is currently
@@ -271,21 +288,21 @@ listening and the port or _reuse_ options have changed.
 
 ### `EthernetUDP`
 
-* `beginWithReuse(localPort)`: Similar to `begin(localPort)`, but also sets the
+- `beginWithReuse(localPort)`: Similar to `begin(localPort)`, but also sets the
   SO_REUSEADDR socket option.
-* `beginMulticastWithReuse(ip, localPort)`: Similar to
+- `beginMulticastWithReuse(ip, localPort)`: Similar to
   `beginMulticast(ip, localPort)`, but also sets the SO_REUSEADDR socket option.
-* `data()`: Returns a pointer to the received packet data.
-* `localPort()`: Returns the port to which the socket is bound, or zero if it is
+- `data()`: Returns a pointer to the received packet data.
+- `localPort()`: Returns the port to which the socket is bound, or zero if it is
   not bound.
-* `send(host, port, data, len)`: Sends a packet without having to use
+- `send(host, port, data, len)`: Sends a packet without having to use
   `beginPacket()`, `write()`, and `endPacket()`. It causes less overhead. The
   host can be either an IP address or a hostname.
-* `size()`: Returns the total size of the received packet data.
-* `operator bool()`: Tests if the socket is listening.
-* `static constexpr int maxSockets()`: Returns the maximum number of
+- `size()`: Returns the total size of the received packet data.
+- `operator bool()`: Tests if the socket is listening.
+- `static constexpr int maxSockets()`: Returns the maximum number of
   UDP sockets.
-* `EthernetUDP(queueSize)`: Creates a new UDP socket having the specified packet
+- `EthernetUDP(queueSize)`: Creates a new UDP socket having the specified packet
   queue size. The minimum possible value is 1 and the default is 1. If a value
   of zero is used, it will default to 1.
 
@@ -328,31 +345,31 @@ frames. It provides an API that is similar in feel to `EthernetUDP`. Because,
 like `EthernetUDP`, it derives from `Stream`, the `Stream` API can be used to
 read from a frame and the `Print` API can be used to write to the frame.
 
-* `beginFrame()`: Starts a new frame. New data can be added using the
+- `beginFrame()`: Starts a new frame. New data can be added using the
   `Print` API. This is similar to `EthernetUDP::beginPacket()`.
-* `beginFrame(dstAddr, srcAddr, typeOrLen)`: Starts a new frame and writes the
+- `beginFrame(dstAddr, srcAddr, typeOrLen)`: Starts a new frame and writes the
   given addresses and EtherType/length.
-* `beginVLANFrame(dstAddr, srcAddr, vlanInfo, typeOrLen)`: Starts a new
+- `beginVLANFrame(dstAddr, srcAddr, vlanInfo, typeOrLen)`: Starts a new
   VLAN-tagged frame and writes the given addresses, VLAN info, and
   EtherType/length.
-* `data()`: Returns a pointer to the received frame data.
-* `endFrame()`: Sends the frame. This returns whether the send was successful. A
+- `data()`: Returns a pointer to the received frame data.
+- `endFrame()`: Sends the frame. This returns whether the send was successful. A
   frame must have been started, its data length must be in the range 60-1518,
   and Ethernet must have been initialized. This is similar
   to `EthernetUDP::endPacket()`.
-* `parseFrame()`: Checks if a new frame is available. This is similar
+- `parseFrame()`: Checks if a new frame is available. This is similar
   to `EthernetUDP::parseFrame()`.
-* `send(frame, len)`: Sends a raw Ethernet frame without the overhead of
+- `send(frame, len)`: Sends a raw Ethernet frame without the overhead of
   `beginFrame()`/`write()`/`endFrame()`. This is similar
   to `EthernetUDP::send(data, len)`.
-* `setReceiveQueueSize(size)`: Sets the receive queue size. The minimum possible
+- `setReceiveQueueSize(size)`: Sets the receive queue size. The minimum possible
   value is 1 and the default is 1. If a value of zero is used, it will default
   to 1. If the new size is smaller than the number of items in the queue then
   all the oldest frames will get dropped.
-* `static constexpr int maxFrameLen()`: Returns the maximum frame length
+- `static constexpr int maxFrameLen()`: Returns the maximum frame length
   including the FCS. Subtract 4 to get the maximum length that can be sent or
   received using this API.
-* `static constexpr int minFrameLen()`: Returns the minimum frame length
+- `static constexpr int minFrameLen()`: Returns the minimum frame length
   including the FCS. Subtract 4 to get the minimum length that can be sent or
   received using this API.
 
@@ -360,35 +377,35 @@ read from a frame and the `Print` API can be used to write to the frame.
 
 The `MDNS` object provides an mDNS API.
 
-* `begin(hostname)`: Starts the mDNS responder and uses the given hostname as
+- `begin(hostname)`: Starts the mDNS responder and uses the given hostname as
   the name. This first calls `end()` only if the responder is currently running
   and the hostname is different.
-* `end()`: Stops the mDNS responder.
-* `addService(type, protocol, port)`: Adds a service. The protocol will be set
+- `end()`: Stops the mDNS responder.
+- `addService(type, protocol, port)`: Adds a service. The protocol will be set
   to `"_udp"` for anything other than `"_tcp"`. The strings should have a `"_"`
   prefix. Uses the hostname as the service name.
-* `addService(type, protocol, port, getTXTFunc)`: Adds a service and associated
+- `addService(type, protocol, port, getTXTFunc)`: Adds a service and associated
   TXT records.
-* `hostname()`: Returns the hostname if the responder is running and an empty
+- `hostname()`: Returns the hostname if the responder is running and an empty
   string otherwise.
-* `removeService(type, protocol, port)`: Removes a service.
-* `restart()`: Restarts the responder, for use when the cable has been
+- `removeService(type, protocol, port)`: Removes a service.
+- `restart()`: Restarts the responder, for use when the cable has been
   disconnected for a while and then reconnected. This isn't normally needed
   because the responder already watches for link reconnect.
-* `operator bool()`: Tests if the mDNS responder is operating.
-* `static constexpr int maxServices()`: Returns the maximum number of
+- `operator bool()`: Tests if the mDNS responder is operating.
+- `static constexpr int maxServices()`: Returns the maximum number of
   supported services.
 
 ### `DNSClient`
 
 The `DNSClient` class provides an interface to the DNS client.
 
-* `setServer(index, ip)`: Sets a DNS server address.
-* `getServer(index)`: Gets a DNS server address.
-* `getHostByName(hostname, callback)`: Looks up a host by name and calls the
+- `setServer(index, ip)`: Sets a DNS server address.
+- `getServer(index)`: Gets a DNS server address.
+- `getHostByName(hostname, callback)`: Looks up a host by name and calls the
   callback when there's a result.
-* `getHostByName(hostname, ip, timeout)`: Looks up a host by name.
-* `static constexpr int maxServers()`: Returns the maximum number of
+- `getHostByName(hostname, ip, timeout)`: Looks up a host by name.
+- `static constexpr int maxServers()`: Returns the maximum number of
   DNS servers.
 
 ### Print utilities
@@ -477,6 +494,7 @@ bool isConnected() {
 ```
 
 See also:
+
 1. [The safe bool problem](https://en.cppreference.com/w/cpp/language/implicit_conversion#The_safe_bool_problem)
 2. [`explicit` specifier](https://en.cppreference.com/w/cpp/language/explicit)
 
@@ -511,9 +529,10 @@ here are a few steps to follow:
 
 Please see the examples for more things you can do with the API, including but
 not limited to:
-* Using listeners to watch for network changes,
-* Monitoring and sending raw Ethernet frames, and
-* Setting up an mDNS service.
+
+- Using listeners to watch for network changes,
+- Monitoring and sending raw Ethernet frames, and
+- Setting up an mDNS service.
 
 ### Asynchronous use is not supported
 
@@ -531,6 +550,7 @@ claims to provide asynchronous support. Neither of these claims is true.
 ## How to write data to connections
 
 I'll start with these statements:
+
 1. **Don't use the <code>print<em>X</em>(...)</code> functions when writing data
    to connections.**
 2. **Always check the `write(...)` and <code>print<em>X</em>(...)</code> return
@@ -671,12 +691,12 @@ The `write(...)` functions don't have this problem (unless, of course, there's a
 faulty implementation). They attempt to send bytes and return the number of
 bytes actually sent.
 
-In summary, my ***strong*** suggestion is to use the `write(...)` functions when
+In summary, my _**strong**_ suggestion is to use the `write(...)` functions when
 sending network data, checking the return values and acting on them. Or you can
 use the library's `writeFully(...)` functions.
 
 See the discussion at:
-https://forum.pjrc.com/threads/68389-NativeEthernet-stalling-with-dropped-packets
+<https://forum.pjrc.com/threads/68389-NativeEthernet-stalling-with-dropped-packets>
 
 ### Write immediacy
 
@@ -725,6 +745,7 @@ you've always hoped Teensy library examples could be.
 ## A survey of how connections (aka `EthernetClient`) work
 
 Hopefully this section disambiguates some details about what each function does:
+
 1. `connected()`: Returns whether connected OR data is still available
    (or both).
 2. `operator bool()`: Returns whether connected (at least in _QNEthernet_).
@@ -822,6 +843,7 @@ To send multicast traffic, simply send to the appropriate IP address. There's no
 need to join a group.
 
 The lwIP stack keeps track of a group "use count". This means:
+
 1. That `joinGroup(ip)` can be called multiple times, it just needs to be paired
    with a matching number of calls to `leaveGroup(ip)`. Each call increments an
    internal count.
@@ -837,6 +859,7 @@ responsive to state changes during program operation.
 
 The relevant functions are (see the [`Ethernet`](#ethernet) section for further
 descriptions):
+
 1. `Ethernet.onLinkState(cb)`
 2. `Ethernet.onAddressChanged(cb)`
 3. `Ethernet.onInterfaceStatus(cb)`
@@ -895,25 +918,31 @@ value of zero will use the default of 1.
 ## mDNS services
 
 It's possible to register mDNS services. Some notes:
-* Similar to `Ethernet`, there is a global `MDNS` object. It too is in the
+
+- Similar to `Ethernet`, there is a global `MDNS` object. It too is in the
   `qindesign::network` namespace.
-* It's possible to add TXT items when adding a service. For example, the
+- It's possible to add TXT items when adding a service. For example, the
   following code adds "path=/" to the TXT of an HTTP service:
+
   ```c++
     MDNS.begin("Device Name");
     MDNS.addService("_http", "_tcp", 80, []() {
       return std::vector<String>{"path=/"};
     });
   ```
+
   You can add more than one item to the TXT record by adding to the vector.
-* When adding a service, the function that returns TXT items defaults to NULL,
+- When adding a service, the function that returns TXT items defaults to NULL,
   so it's not necessary to specify that parameter. For example:
+
   ```c++
     MDNS.begin("Device Name");
     MDNS.addService("_http", "_tcp", 80);
   ```
-* The host name is normally used as the service name, but there are also
+
+- The host name is normally used as the service name, but there are also
   functions that let you specify the service name. For example:
+
   ```c++
   MDNS.begin("Host Name");
   MDNS.addService("my-http-service", "_http", "_tcp", 80);
@@ -925,6 +954,7 @@ The library interfaces with DNS using the `DNSClient` class. Note that all the
 functions are static.
 
 Things you can do:
+
 1. Look up an IP address by name, and
 2. Set multiple DNS servers.
 
@@ -940,6 +970,7 @@ variable must be set to something conforming to the `Print` interface. If it is
 not set, `printf(...)` will still work, but there will be no output.
 
 For example:
+
 ```c++
 void setup() {
   Serial.begin(115200);
@@ -978,6 +1009,7 @@ nowhere and assign it to `stderrPrint`. The reason for this is that the default
 behaviour was chosen to be to send both outputs to `stdPrint`.
 
 For example:
+
 ```c++
 class NullPrint : public Print {
  public:
@@ -1002,6 +1034,7 @@ There is support for sending and receiving raw Ethernet frames. See the
 [`EthernetFrame`](#ethernetframe) API, above.
 
 This API doesn't receive any known Ethernet frame types. These include:
+
 1. IPv4 (0x0800)
 2. ARP  (0x0806)
 3. IPv6 (0x86DD) (if enabled)
@@ -1097,6 +1130,7 @@ Teensy side waiting for replies and retrying, and the Windows side no longer
 sending traffic.
 
 To mitigate this problem, there are a few possible solutions, including:
+
 1. Reduce the number of retransmission attempts by changing the `TCP_MAXRTX`
    setting in `lwipopts.h`, or
 2. Abort connections upon link disconnect.
@@ -1107,17 +1141,18 @@ could be called on connections when the link has been disconnected. (See also
 `Ethernet.onLinkState(cb)` or `Ethernet.linkState()`.)
 
 Fun links:
-* [Removing Exponential Backoff from TCP - acm sigcomm](http://www.sigcomm.org/node/2736)
-* [Exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff)
+
+- [Removing Exponential Backoff from TCP - acm sigcomm](http://www.sigcomm.org/node/2736)
+- [Exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff)
 
 ## Notes on ordering and timing
 
-* Link status is polled about 8 times a second.
-* For static IP addresses, the _address-changed_ callback is called before
+- Link status is polled about 8 times a second.
+- For static IP addresses, the _address-changed_ callback is called before
   lwIP's `netif_default` is set. `MDNS.begin()` relies on `netif_default`, so
   that function and anything else that relies on `netif_default` should be
   called after `Ethernet.begin(...)`, and not from the listener.
-* The DNS lookup timeout is `DNS_MAX_RETRIES * DNS_TMR_INTERVAL`, where
+- The DNS lookup timeout is `DNS_MAX_RETRIES * DNS_TMR_INTERVAL`, where
   `DNS_TMR_INTERVAL` is 1000.
 
 ## Notes on RAM1 usage
@@ -1213,16 +1248,16 @@ Input is welcome.
 
 ## To do
 
-* Tune lwIP.
-* A better API design than the Arduino-defined API.
-* Perhaps zero-copy is an option.
-* Make a test suite.
-* I have seen
+- Tune lwIP.
+- A better API design than the Arduino-defined API.
+- Perhaps zero-copy is an option.
+- Make a test suite.
+- I have seen
   `Assertion "tcp_slowtmr: TIME-WAIT pcb->state == TIME-WAIT" failed at line 1442 in src/lwip/tcp.c`
   when sending a large amount of data. Either it's an lwIP bug or I'm doing
   something wrong.
-  See: https://lists.gnu.org/archive/html/lwip-users/2010-02/msg00013.html
-* More examples.
+  See: <https://lists.gnu.org/archive/html/lwip-users/2010-02/msg00013.html>
+- More examples.
 
 ## Code style
 
@@ -1234,17 +1269,17 @@ Other conventions are adopted from Bjarne Stroustrup's and Herb Sutter's
 
 ## References
 
-* lwIP testing by manitou:
-  https://forum.pjrc.com/threads/60532-Teensy-4-1-Beta-Test?p=237096&viewfull=1#post237096
-* Dan Drown's NTP server and 1588 timestamps:
-  https://forum.pjrc.com/threads/61581-Teensy-4-1-NTP-server
-* Paul Stoffregen's original Teensy 4.1 Ethernet code:
-  https://github.com/PaulStoffregen/teensy41_ethernet
-* Dan Drown's modifications to Paul's code:
-  https://github.com/ddrown/teensy41_ethernet
-* Tino Hernandez's (vjmuzik) FNET-based NativeEthernet library:
-  https://forum.pjrc.com/threads/60857-T4-1-Ethernet-Library
-* [Arduino Ethernet library](https://www.arduino.cc/reference/en/libraries/ethernet/)
+- lwIP testing by manitou:
+  <https://forum.pjrc.com/threads/60532-Teensy-4-1-Beta-Test?p=237096&viewfull=1#post237096>
+- Dan Drown's NTP server and 1588 timestamps:
+  <https://forum.pjrc.com/threads/61581-Teensy-4-1-NTP-server>
+- Paul Stoffregen's original Teensy 4.1 Ethernet code:
+  <https://github.com/PaulStoffregen/teensy41_ethernet>
+- Dan Drown's modifications to Paul's code:
+  <https://github.com/ddrown/teensy41_ethernet>
+- Tino Hernandez's (vjmuzik) FNET-based NativeEthernet library:
+  <https://forum.pjrc.com/threads/60857-T4-1-Ethernet-Library>
+- [Arduino Ethernet library](https://www.arduino.cc/reference/en/libraries/ethernet/)
 
 ---
 
