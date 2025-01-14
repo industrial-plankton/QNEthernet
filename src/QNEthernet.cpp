@@ -162,7 +162,7 @@ bool EthernetClass::begin(const IPAddress &ip,
     netif_set_down(netif_);
   }
 
-  if (dns != INADDR_NONE) {
+  if (dns != (uint32_t)0) {
     setDNSServerIP(dns);
   }
   return begin(&ipaddr, &netmask, &gw);
